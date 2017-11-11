@@ -16,7 +16,7 @@ discard glSetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE)
 var
   screen_width: cint = 640
   screen_height: cint = 480
-  window = createWindow("nim img", 100, 100, screen_width, screen_height, SDL_WINDOW_OPENGL)
+  window = createWindow("Modern OpenGL", 100, 100, screen_width, screen_height, SDL_WINDOW_OPENGL)
   context = window.glCreateContext()
 
 
@@ -127,21 +127,25 @@ var vbo: GLuint
 glGenBuffers(1, vbo.addr)
 glBindBuffer(GL_ARRAY_BUFFER, vbo)
 
-var vertex_data: array[20, GLFloat] = [
-#  X      Y      Z      U      V 
-   0.5f,  0.5f,  0.0f,  1.0f,  1.0f,
-  -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
-   0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
-  -0.5f, -0.5f,  0.0f,  0.0f,  0.0f,
+var vertex_data: array[36, GLFloat] = [
+#  X      Y      Z      R     G     B     A     U      V 
+   0.5f,  0.5f,  0.0f,  0.0,  1.0,  1.0,  1.0,  1.0f,  1.0f,
+  -0.5f,  0.5f,  0.0f,  1.0,  0.0,  1.0,  0.5,  0.0f,  1.0f,
+   0.5f, -0.5f,  0.0f,  1.0,  1.0,  0.0,  1.0,  1.0f,  0.0f,
+  -0.5f, -0.5f,  0.0f,  0.0,  0.0,  1.0,  0.5,  0.0f,  0.0f,
 ]
 
 # set the XYZ for attribute for shaders
 glEnableVertexAttribArray(0)
-glVertexAttribPointer(0, 3, cGL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), cast[Glvoid](0 * sizeof(GLfloat)))
+glVertexAttribPointer(0, 3, cGL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), cast[Glvoid](0 * sizeof(GLfloat)))
+
+# set the RGBA for attribute for shaders
+glEnableVertexAttribArray(1)
+glVertexAttribPointer(1, 4, cGL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), cast[Glvoid](3 * sizeof(GLfloat)))
 
 # set the UV for attribute for shaders
-glEnableVertexAttribArray(1)
-glVertexAttribPointer(1, 2, cGL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), cast[Glvoid](3 * sizeof(GLfloat)))
+glEnableVertexAttribArray(2)
+glVertexAttribPointer(2, 2, cGL_FLOAT, GL_FALSE, 9 * sizeof(GLfloat), cast[Glvoid](7 * sizeof(GLfloat)))
 
 # send to gl
 glBufferData(GL_ARRAY_BUFFER, vertex_data.sizeof, vertex_data.addr, GL_STATIC_DRAW)
@@ -177,6 +181,7 @@ while run_app:
       break
 
   glClear(GL_COLOR_BUFFER_BIT)
+
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nil)
   glSwapWindow(window)
 
